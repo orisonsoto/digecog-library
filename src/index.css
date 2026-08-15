@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   DIGECOG 360° — Design tokens
+   Paleta: interpretación profesional propia inspirada en la identidad bancaria/
+   institucional dominicana (azul profundo + celeste), ver docs §6. No son colores
+   de marca DIGECOG verificados: no fue posible obtener el hex oficial en esta sesión.
+   ========================================================================== */
+@theme {
+  --color-brand-950: #071a33;
+  --color-brand-900: #0b2a52;
+  --color-brand-800: #0f3d73;
+  --color-brand-700: #145294;
+  --color-brand-600: #1968b3;
+  --color-brand-500: #2382cf;
+  --color-brand-400: #4ea3e0;
+  --color-brand-300: #8cc4ec;
+  --color-brand-200: #c3e0f5;
+  --color-brand-100: #e3f1fb;
+  --color-brand-50: #f2f9fd;
+
+  --color-accent-teal: #0ea5a0;
+  --color-accent-amber: #d68910;
+  --color-accent-red: #c0392b;
+  --color-accent-green: #1e8f5f;
+
+  --font-sans: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+  --font-mono: 'Cascadia Code', ui-monospace, Consolas, monospace;
+}
+
+:root {
+  --bg-app: #f4f7fb;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #f8fafc;
+  --bg-sidebar: #0b2a52;
+  --text-primary: #0f1b2d;
+  --text-secondary: #4b5d75;
+  --text-muted: #8194ab;
+  --border-subtle: #e1e8f0;
+  --border-strong: #c3d2e3;
+  --shadow-card: 0 1px 2px rgba(15,27,45,0.04), 0 4px 16px rgba(15,27,45,0.06);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+}
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c3d2e3; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #a8bdd3; }
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.demo-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #fef3e2;
+  color: #9a5b00;
+  border: 1px solid #f4dcae;
+  white-space: nowrap;
+}
+.real-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #e5f4ee;
+  color: #146c43;
+  border: 1px solid #bfe4d2;
+  white-space: nowrap;
+}
+
+table { border-collapse: collapse; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fade-in { animation: fadeIn .22s ease-out; }
