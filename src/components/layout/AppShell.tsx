@@ -14,11 +14,12 @@ export function AppShell() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden" style={{ background: 'var(--bg-app)' }}>
+    // h-dvh (no h-screen) para que la barra de direcciones del navegador móvil no recorte el contenido.
+    <div className="flex h-dvh w-full overflow-hidden" style={{ background: 'var(--bg-app)' }}>
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar />
-        <main className="flex-1 overflow-y-auto p-5">
+        <main className="flex-1 overflow-y-auto p-3 md:p-5">
           <Outlet />
         </main>
       </div>

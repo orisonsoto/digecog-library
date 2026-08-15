@@ -35,6 +35,19 @@ La aplicación abre en una pantalla de acceso institucional con doble factor sim
 
 La sesión se guarda en `sessionStorage`, por lo que se mantiene al recargar y se cierra al cerrar la pestaña.
 
+## Diseño responsive
+
+La experiencia primaria es escritorio, pero el prototipo se adapta a tablet y celular:
+
+| Ancho | Comportamiento |
+|---|---|
+| `≥ 1024px` (escritorio) | Sidebar fijo (248px, colapsable a iconos), panel contextual derecho fijo (320px), búsqueda inline en el topbar. |
+| `< 1024px` (tablet/celular) | Sidebar como **drawer** superpuesto con backdrop, abierto desde el botón hamburguesa; panel contextual y Mía AI como **hoja a pantalla completa**; búsqueda desplegable desde un icono; topbar compacto con marca visible. |
+
+Detalles considerados: `h-dvh` en lugar de `h-screen` para que la barra de direcciones del navegador móvil
+no recorte el contenido, objetivos táctiles de ~44px en la navegación y controles, cierre del drawer al
+navegar, y tablas/gráficos con desplazamiento horizontal contenido (sin desbordar la página).
+
 ## Desarrollo local
 
 ```bash

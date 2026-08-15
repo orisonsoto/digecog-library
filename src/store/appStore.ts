@@ -75,6 +75,9 @@ interface AppState {
   setMiaAbierta: (v: boolean) => void;
   sidebarColapsado: boolean;
   toggleSidebar: () => void;
+  /** Drawer de navegación en móvil (< lg). En escritorio el sidebar es fijo. */
+  menuMovilAbierto: boolean;
+  setMenuMovilAbierto: (v: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -100,10 +103,13 @@ export const useAppStore = create<AppState>((set) => ({
   setPeriodoKey: (k) => set({ periodoKey: k }),
   institucionSeleccionadaId: null,
   setInstitucionSeleccionada: (id) => set({ institucionSeleccionadaId: id }),
-  panelDerechoAbierto: true,
+  // En móvil el panel es una hoja a pantalla completa: debe iniciar cerrado.
+  panelDerechoAbierto: typeof window === 'undefined' ? true : window.innerWidth >= 1024,
   setPanelDerechoAbierto: (v) => set({ panelDerechoAbierto: v }),
   miaAbierta: false,
   setMiaAbierta: (v) => set({ miaAbierta: v }),
   sidebarColapsado: false,
   toggleSidebar: () => set((s) => ({ sidebarColapsado: !s.sidebarColapsado })),
+  menuMovilAbierto: false,
+  setMenuMovilAbierto: (v) => set({ menuMovilAbierto: v }),
 }));

@@ -122,7 +122,7 @@ export default function Login() {
               <p className="text-xs text-[var(--text-secondary)] mb-5">Ecosistema DIGECOG Interno · Entidades del SPNF · Inteligencia Nacional</p>
 
               <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">Perfil de acceso (demo)</label>
-              <select value={rol} onChange={(e) => setRol(e.target.value)} className="w-full mb-4 rounded-lg border border-[var(--border-subtle)] px-3 py-2 text-sm outline-none focus:border-[var(--color-brand-500)]">
+              <select value={rol} onChange={(e) => setRol(e.target.value)} className="w-full mb-4 rounded-lg border border-[var(--border-subtle)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-500)]">
                 {ROLES.map((r) => <option key={r}>{r}</option>)}
               </select>
 
@@ -133,7 +133,7 @@ export default function Login() {
                 onKeyDown={(e) => e.key === 'Enter' && validarCredenciales()}
                 placeholder="correo@ejemplo.com"
                 autoComplete="username"
-                className="w-full mb-3 rounded-lg border border-[var(--border-subtle)] px-3 py-2 text-sm outline-none focus:border-[var(--color-brand-500)]"
+                className="w-full mb-3 rounded-lg border border-[var(--border-subtle)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-500)]"
               />
               <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">Contraseña</label>
               <input
@@ -143,7 +143,7 @@ export default function Login() {
                 onKeyDown={(e) => e.key === 'Enter' && validarCredenciales()}
                 placeholder="••••"
                 autoComplete="current-password"
-                className="w-full mb-3 rounded-lg border border-[var(--border-subtle)] px-3 py-2 text-sm outline-none focus:border-[var(--color-brand-500)]"
+                className="w-full mb-3 rounded-lg border border-[var(--border-subtle)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-500)]"
               />
 
               {error && (
