@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { ShieldCheck, KeyRound, Fingerprint, AlertCircle } from 'lucide-react';
 import { useAppStore, validarCredencial, CREDENCIAL_DEMO } from '../store/appStore';
+import { ALCANCE_POR_ROL, rutaInicialDe } from '../lib/permisos';
 
 const ROLES = [
   'Director General', 'Directores Misionales', 'Planificación y Desarrollo',
@@ -16,6 +17,7 @@ export default function Login() {
   const navigate = useNavigate();
   const iniciarSesion = useAppStore((s) => s.iniciarSesion);
   const autenticado = useAppStore((s) => s.autenticado);
+  const rolSesion = useAppStore((s) => s.rol);
 
   const [rol, setRol] = useState(ROLES[0]);
   const [paso, setPaso] = useState<'credenciales' | 'mfa'>('credenciales');
@@ -45,7 +47,8 @@ export default function Login() {
     }
     setErrorMfa(null);
     const resultado = iniciarSesion(usuario, clave, rol);
-    if (resultado.ok) navigate('/');
+    // Cada perfil aterriza en la primera pantalla de su alcance (RBAC).
+    if (resultado.ok) navigate(rutaInicialDe(rol));
   }
 
   /**
@@ -78,8 +81,8 @@ export default function Login() {
     requestAnimationFrame(() => document.getElementById(`mfa-${siguiente}`)?.focus());
   }
 
-  // Si ya hay sesión activa, no mostramos el acceso: vamos al Centro de Mando.
-  if (autenticado) return <Navigate to="/" replace />;
+  // Si ya hay sesión activa, vamos a la pantalla de inicio que corresponda al perfil.
+  if (autenticado) return <Navigate to={rutaInicialDe(rolSesion)} replace />;
 
   return (
     <div className="min-h-screen w-full flex" style={{ background: 'linear-gradient(135deg, var(--color-brand-950), var(--color-brand-800) 60%, var(--color-brand-600))' }}>
@@ -123,9 +126,12 @@ export default function Login() {
               <p className="text-xs text-[var(--text-secondary)] mb-5">Ecosistema DIGECOG Interno · Entidades del SPNF · Inteligencia Nacional</p>
 
               <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">Perfil de acceso (demo)</label>
-              <select value={rol} onChange={(e) => setRol(e.target.value)} className="w-full mb-4 rounded-lg border border-[var(--border-subtle)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-500)]">
+              <select value={rol} onChange={(e) => setRol(e.target.value)} className="w-full mb-2 rounded-lg border border-[var(--border-subtle)] px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-500)]">
                 {ROLES.map((r) => <option key={r}>{r}</option>)}
               </select>
+              <div className="mb-4 rounded-lg bg-slate-50 border border-[var(--border-subtle)] px-2.5 py-2 text-[11px] text-[var(--text-secondary)]">
+                <span className="font-semibold text-[var(--text-primary)]">Alcance:</span> {ALCANCE_POR_ROL[rol]}
+              </div>
 
               <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">Usuario institucional</label>
               <input

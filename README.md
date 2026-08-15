@@ -35,6 +35,34 @@ La aplicación abre en una pantalla de acceso institucional con doble factor sim
 
 La sesión se guarda en `sessionStorage`, por lo que se mantiene al recargar y se cierra al cerrar la pestaña.
 
+## Control de acceso por rol (RBAC)
+
+El perfil elegido en la pantalla de acceso determina qué módulos ve y puede abrir el usuario.
+Los alcances reproducen los perfiles diferenciados del §39 del prompt maestro y viven en
+[`src/lib/permisos.ts`](src/lib/permisos.ts).
+
+| Perfil | Alcance | Módulos |
+|---|---|---:|
+| Director General | Acceso ejecutivo total | 28 |
+| Directores Misionales | Analítico y operativo sobre la función misional | 19 |
+| Procesamiento Contable y Estados Financieros | Contabilidad, estados, cierre y consolidación | 12 |
+| Análisis de Información Financiera | SISACNOC, analítica, estadísticas y calidad | 12 |
+| Auditor | Consulta y trazabilidad, sin gestión | 15 |
+| Planificación y Desarrollo | PEI, POA, proyectos, riesgos, calidad, documental | 12 |
+| Políticas, Normas y Procedimientos Contables | Normativas, catálogo y capacitación | 7 |
+| Jurídico / Cumplimiento | Normativas, SIG y cumplimiento | 7 |
+| Tecnología | Interoperabilidad, administración y calidad | 6 |
+| Entidad Reportante (SPNF) | Solo su institución; inicia en el Centro de Cierre | 4 |
+| OAI | Transparencia, estadísticas y documental | 4 |
+| Ciudadanía | Datos públicos; inicia en Transparencia | 3 |
+
+Comportamiento: el sidebar solo lista los módulos del alcance, cada perfil aterriza en su propia
+pantalla de inicio, la navegación directa por URL a un módulo fuera de alcance muestra una pantalla
+de **Acceso restringido**, y las alertas y el copiloto Mía AI se ocultan para los perfiles externos.
+
+> La restricción es de interfaz. En una implementación real debe aplicarse también en el servidor,
+> sobre cada consulta de datos.
+
 ## Diseño responsive
 
 La experiencia primaria es escritorio, pero el prototipo se adapta a tablet y celular:

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, ChevronDown, User, LogOut, Menu, X, Sparkles } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
+import { puedeAcceder } from '../../lib/permisos';
 import { PERIODOS } from '../../data/periodos';
 import { INSTITUCIONES } from '../../data/generator';
 import { ALERTAS } from '../../data/generator';
@@ -30,6 +31,8 @@ export function Topbar() {
   }, [busqueda]);
 
   const alertasNoAtendidas = ALERTAS.filter((a) => !a.atendida);
+  const puedeVerAlertas = puedeAcceder(rol, '/alertas');
+  const puedeUsarMia = puedeAcceder(rol, '/mia');
 
   function abrirMia() {
     setMiaAbierta(!miaAbierta);
@@ -111,7 +114,7 @@ export function Topbar() {
             </select>
           </div>
 
-          <div className="relative">
+          <div className={`relative ${puedeVerAlertas ? '' : 'hidden'}`}>
             <button
               onClick={() => setMostrarNotif((v) => !v)}
               aria-label="Alertas"
@@ -146,7 +149,7 @@ export function Topbar() {
           <button
             onClick={abrirMia}
             aria-label="Abrir copiloto Mía AI"
-            className="h-10 w-10 md:h-auto md:w-auto flex items-center justify-center gap-1.5 rounded-lg md:px-3 md:py-1.5 text-sm font-semibold text-white shrink-0"
+            className={`h-10 w-10 md:h-auto md:w-auto items-center justify-center gap-1.5 rounded-lg md:px-3 md:py-1.5 text-sm font-semibold text-white shrink-0 ${puedeUsarMia ? 'flex' : 'hidden'}`}
             style={{ background: 'linear-gradient(135deg, var(--color-brand-600), var(--color-accent-teal))' }}
           >
             <Sparkles size={16} className="md:hidden" />

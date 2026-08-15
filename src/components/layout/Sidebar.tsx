@@ -3,12 +3,17 @@ import clsx from 'clsx';
 import { GRUPOS_ORDEN, RUTAS } from '../../routes';
 import { useAppStore } from '../../store/appStore';
 import { ChevronsLeft, ChevronsRight, X } from 'lucide-react';
+import { puedeAcceder, tieneAccesoTotal } from '../../lib/permisos';
 
 export function Sidebar() {
   const colapsado = useAppStore((s) => s.sidebarColapsado);
   const toggle = useAppStore((s) => s.toggleSidebar);
   const menuMovilAbierto = useAppStore((s) => s.menuMovilAbierto);
   const setMenuMovilAbierto = useAppStore((s) => s.setMenuMovilAbierto);
+  const rol = useAppStore((s) => s.rol);
+
+  // Solo se listan los módulos dentro del alcance del perfil (RBAC, ver lib/permisos.ts).
+  const rutasVisibles = RUTAS.filter((r) => puedeAcceder(rol, r.path));
 
   // En móvil (< lg) el sidebar siempre se muestra expandido dentro del drawer:
   // colapsarlo a iconos solo tiene sentido en escritorio.
@@ -37,9 +42,21 @@ export function Sidebar() {
           )}
         </div>
 
+        {!compacto && rol && (
+          <div className="px-4 pt-3 pb-1 shrink-0">
+            <div className="rounded-lg bg-white/8 border border-white/10 px-2.5 py-1.5">
+              <div className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Perfil activo</div>
+              <div className="text-[11px] font-semibold text-white/85 leading-tight">{rol}</div>
+              <div className="text-[9px] text-white/40 mt-0.5">
+                {tieneAccesoTotal(rol) ? 'Acceso total' : `${rutasVisibles.length} de ${RUTAS.length} módulos`}
+              </div>
+            </div>
+          </div>
+        )}
+
         <nav className="flex-1 py-3 px-2 space-y-4 overflow-y-auto">
           {GRUPOS_ORDEN.map((grupo) => {
-            const items = RUTAS.filter((r) => r.grupo === grupo);
+            const items = rutasVisibles.filter((r) => r.grupo === grupo);
             if (items.length === 0) return null;
             return (
               <div key={grupo}>

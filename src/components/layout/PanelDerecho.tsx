@@ -3,6 +3,7 @@ import { X, Send, Sparkles } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import { ALERTAS } from '../../data/generator';
 import { responderMia, PREGUNTAS_SUGERIDAS } from '../../lib/miaEngine';
+import { puedeAcceder } from '../../lib/permisos';
 import { DemoTag, Badge } from '../ui/primitives';
 
 interface Mensaje { autor: 'usuario' | 'mia'; texto: string }
@@ -11,7 +12,10 @@ export function PanelDerecho() {
   const abierto = useAppStore((s) => s.panelDerechoAbierto);
   const setAbierto = useAppStore((s) => s.setPanelDerechoAbierto);
   const miaAbierta = useAppStore((s) => s.miaAbierta);
-  const [tab, setTab] = useState<'alertas' | 'mia'>('alertas');
+  const rol = useAppStore((s) => s.rol);
+  const puedeVerAlertas = puedeAcceder(rol, '/alertas');
+  const puedeUsarMia = puedeAcceder(rol, '/mia');
+  const [tab, setTab] = useState<'alertas' | 'mia'>(puedeVerAlertas ? 'alertas' : 'mia');
   const [mensajes, setMensajes] = useState<Mensaje[]>([
     { autor: 'mia', texto: 'Hola, soy Mía, el copiloto de inteligencia contable de DIGECOG. ¿En qué puedo ayudarle hoy?' },
   ]);
@@ -20,6 +24,9 @@ export function PanelDerecho() {
 
   useEffect(() => { if (miaAbierta) setTab('mia'); }, [miaAbierta]);
   useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' }); }, [mensajes]);
+
+  // Perfiles sin alcance sobre alertas ni copiloto no ven el panel contextual.
+  if (!puedeVerAlertas && !puedeUsarMia) return null;
 
   if (!abierto) {
     return (
@@ -55,8 +62,12 @@ export function PanelDerecho() {
     >
       <div className="flex items-center justify-between px-3 h-14 border-b border-[var(--border-subtle)] shrink-0">
         <div className="flex gap-1">
-          <button onClick={() => setTab('alertas')} className={`px-3 py-2 rounded-md text-xs font-semibold ${tab === 'alertas' ? 'bg-[var(--color-brand-50)] text-[var(--color-brand-700)]' : 'text-[var(--text-muted)]'}`}>Alertas</button>
-          <button onClick={() => setTab('mia')} className={`px-3 py-2 rounded-md text-xs font-semibold flex items-center gap-1 ${tab === 'mia' ? 'bg-[var(--color-brand-50)] text-[var(--color-brand-700)]' : 'text-[var(--text-muted)]'}`}><Sparkles size={12} /> Mía AI</button>
+          {puedeVerAlertas && (
+            <button onClick={() => setTab('alertas')} className={`px-3 py-2 rounded-md text-xs font-semibold ${tab === 'alertas' ? 'bg-[var(--color-brand-50)] text-[var(--color-brand-700)]' : 'text-[var(--text-muted)]'}`}>Alertas</button>
+          )}
+          {puedeUsarMia && (
+            <button onClick={() => setTab('mia')} className={`px-3 py-2 rounded-md text-xs font-semibold flex items-center gap-1 ${tab === 'mia' ? 'bg-[var(--color-brand-50)] text-[var(--color-brand-700)]' : 'text-[var(--text-muted)]'}`}><Sparkles size={12} /> Mía AI</button>
+          )}
         </div>
         <button
           onClick={() => setAbierto(false)}

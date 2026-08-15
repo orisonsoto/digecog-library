@@ -14,9 +14,12 @@ import {
 } from '../data/generator';
 import { fmtRD, fmtPct, fmtNum } from '../lib/format';
 import { MESES_NOMBRE } from '../data/periodos';
+import { useAppStore } from '../store/appStore';
+import { puedeAcceder } from '../lib/permisos';
 
 export default function HomeEjecutivo() {
   const navigate = useNavigate();
+  const rol = useAppStore((s) => s.rol);
 
   const conScg = INSTITUCIONES.filter((i) => i.scgImplementado).length;
   const pctScg = (conScg / INSTITUCIONES.length) * 100;
@@ -154,7 +157,7 @@ export default function HomeEjecutivo() {
           { label: 'ERIR', to: '/erir', icon: FileStack },
           { label: 'Analítica Financiera', to: '/analitica', icon: Gauge },
           { label: 'Empresas Públicas', to: '/empresas-publicas', icon: Building2 },
-        ].map((acc) => (
+        ].filter((acc) => puedeAcceder(rol, acc.to)).map((acc) => (
           <button key={acc.to} onClick={() => navigate(acc.to)} className="card p-3.5 flex flex-col items-center gap-1.5 text-center hover:border-[var(--color-brand-400)] hover:-translate-y-0.5 transition-transform">
             <acc.icon size={20} className="text-[var(--color-brand-600)]" />
             <span className="text-xs font-medium">{acc.label}</span>
