@@ -3,6 +3,9 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { ShieldCheck, KeyRound, Fingerprint, AlertCircle } from 'lucide-react';
 import { useAppStore, validarCredencial, CREDENCIAL_DEMO } from '../store/appStore';
 import { ALCANCE_POR_ROL, rutaInicialDe } from '../lib/permisos';
+import { AvisoLegal } from '../components/AvisoLegal';
+
+const CLAVE_AVISO = 'digecog360.avisoAceptado';
 
 const ROLES = [
   'Director General', 'Directores Misionales', 'Planificación y Desarrollo',
@@ -27,6 +30,16 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [digitos, setDigitos] = useState<string[]>(CODIGO_MFA_DEMO.split(''));
   const [errorMfa, setErrorMfa] = useState<string | null>(null);
+
+  // El aviso legal se muestra una vez por sesión del navegador: cada nueva visita lo ve.
+  const [avisoAceptado, setAvisoAceptado] = useState(() => {
+    try { return sessionStorage.getItem(CLAVE_AVISO) === 'true'; } catch { return false; }
+  });
+
+  function aceptarAviso() {
+    try { sessionStorage.setItem(CLAVE_AVISO, 'true'); } catch { /* sin sessionStorage: solo en memoria */ }
+    setAvisoAceptado(true);
+  }
 
   function validarCredenciales() {
     const resultado = validarCredencial(usuario, clave);
@@ -85,6 +98,8 @@ export default function Login() {
   if (autenticado) return <Navigate to={rutaInicialDe(rolSesion)} replace />;
 
   return (
+    <>
+    {!avisoAceptado && <AvisoLegal onAceptar={aceptarAviso} />}
     <div className="min-h-screen w-full flex" style={{ background: 'linear-gradient(135deg, var(--color-brand-950), var(--color-brand-800) 60%, var(--color-brand-600))' }}>
       <div className="hidden lg:flex flex-1 flex-col justify-between p-12 text-white">
         <div className="flex items-center gap-3">
@@ -214,5 +229,6 @@ export default function Login() {
         </div>
       </div>
     </div>
+    </>
   );
 }
