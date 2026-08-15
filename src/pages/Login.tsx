@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { ShieldCheck, KeyRound, Fingerprint, AlertCircle } from 'lucide-react';
-import { useAppStore, validarCredencial } from '../store/appStore';
+import { useAppStore, validarCredencial, CREDENCIAL_DEMO } from '../store/appStore';
 
 const ROLES = [
   'Director General', 'Directores Misionales', 'Planificación y Desarrollo',
@@ -19,10 +19,11 @@ export default function Login() {
 
   const [rol, setRol] = useState(ROLES[0]);
   const [paso, setPaso] = useState<'credenciales' | 'mfa'>('credenciales');
-  const [usuario, setUsuario] = useState('');
-  const [clave, setClave] = useState('');
+  // Campos precargados con las credenciales de demostración: el evaluador solo pulsa los botones.
+  const [usuario, setUsuario] = useState(CREDENCIAL_DEMO.usuario);
+  const [clave, setClave] = useState(CREDENCIAL_DEMO.clave);
   const [error, setError] = useState<string | null>(null);
-  const [digitos, setDigitos] = useState<string[]>(['', '', '', '', '', '']);
+  const [digitos, setDigitos] = useState<string[]>(CODIGO_MFA_DEMO.split(''));
   const [errorMfa, setErrorMfa] = useState<string | null>(null);
 
   function validarCredenciales() {
