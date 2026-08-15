@@ -93,7 +93,7 @@ export default function Login() {
         </div>
         <div className="max-w-md space-y-4">
           <div className="text-3xl font-bold leading-tight">
-            El sistema nervioso financiero y contable del Estado dominicano.
+            Una sola visión de las finanzas públicas dominicanas.
           </div>
           <p className="text-white/70 text-sm leading-relaxed">
             "Dirigir el Sistema de Contabilidad del Sector Público para la consolidación, transparencia
