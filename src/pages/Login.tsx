@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { ShieldCheck, KeyRound, Fingerprint, AlertCircle } from 'lucide-react';
-import { DemoTag } from '../components/ui/primitives';
-import { useAppStore, CREDENCIAL_DEMO, validarCredencial } from '../store/appStore';
+import { useAppStore, validarCredencial } from '../store/appStore';
 
 const ROLES = [
   'Director General', 'Directores Misionales', 'Planificación y Desarrollo',
@@ -163,12 +162,6 @@ export default function Login() {
               <div className="flex items-center gap-2 text-[11px] text-[var(--text-muted)] justify-center mb-2">
                 <ShieldCheck size={13} /> Single Sign-On · Segregación de funciones (RBAC)
               </div>
-              <div className="rounded-lg bg-slate-50 border border-[var(--border-subtle)] px-2.5 py-2 text-[11px] text-[var(--text-secondary)] mb-2">
-                <strong className="text-[var(--text-primary)]">Credenciales de demostración</strong><br />
-                Usuario: <code>{CREDENCIAL_DEMO.usuario}</code><br />
-                Contraseña: <code>{CREDENCIAL_DEMO.clave}</code> · Código MFA: <code>{CODIGO_MFA_DEMO}</code>
-              </div>
-              <div className="flex justify-center"><DemoTag label="ENTORNO DE DEMOSTRACIÓN" /></div>
             </>
           ) : (
             <>
