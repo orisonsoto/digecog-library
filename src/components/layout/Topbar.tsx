@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Bell, ChevronDown, User } from 'lucide-react';
+import { Search, Bell, ChevronDown, User, LogOut } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import { PERIODOS } from '../../data/periodos';
 import { INSTITUCIONES } from '../../data/generator';
@@ -11,9 +11,13 @@ export function Topbar() {
   const setPeriodoKey = useAppStore((s) => s.setPeriodoKey);
   const miaAbierta = useAppStore((s) => s.miaAbierta);
   const setMiaAbierta = useAppStore((s) => s.setMiaAbierta);
+  const usuario = useAppStore((s) => s.usuario);
+  const rol = useAppStore((s) => s.rol);
+  const cerrarSesion = useAppStore((s) => s.cerrarSesion);
   const [busqueda, setBusqueda] = useState('');
   const [mostrarResultados, setMostrarResultados] = useState(false);
   const [mostrarNotif, setMostrarNotif] = useState(false);
+  const [mostrarPerfil, setMostrarPerfil] = useState(false);
   const navigate = useNavigate();
 
   const resultados = useMemo(() => {
@@ -104,14 +108,30 @@ export function Topbar() {
           ✦ Mía AI
         </button>
 
-        <div className="flex items-center gap-2 pl-2 border-l border-[var(--border-subtle)] ml-1">
-          <div className="h-8 w-8 rounded-full bg-[var(--color-brand-100)] flex items-center justify-center text-[var(--color-brand-700)]">
-            <User size={16} />
-          </div>
-          <div className="hidden md:block leading-tight">
-            <div className="text-xs font-semibold">Dirección General</div>
-            <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-0.5">Sesión demo <ChevronDown size={10} /></div>
-          </div>
+        <div className="relative pl-2 border-l border-[var(--border-subtle)] ml-1">
+          <button onClick={() => setMostrarPerfil((v) => !v)} className="flex items-center gap-2 rounded-lg px-1 py-1 hover:bg-slate-50">
+            <div className="h-8 w-8 rounded-full bg-[var(--color-brand-100)] flex items-center justify-center text-[var(--color-brand-700)]">
+              <User size={16} />
+            </div>
+            <div className="hidden md:block leading-tight text-left">
+              <div className="text-xs font-semibold">{rol ?? 'Sesión demo'}</div>
+              <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-0.5">{usuario ?? 'invitado'} <ChevronDown size={10} /></div>
+            </div>
+          </button>
+          {mostrarPerfil && (
+            <div className="absolute right-0 mt-2 w-60 card overflow-hidden z-40">
+              <div className="px-3 py-2.5 border-b border-[var(--border-subtle)]">
+                <div className="text-xs font-semibold text-[var(--text-primary)]">{usuario}</div>
+                <div className="text-[11px] text-[var(--text-muted)]">{rol}</div>
+              </div>
+              <button
+                onClick={() => { cerrarSesion(); setMostrarPerfil(false); navigate('/login'); }}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-medium text-red-600 hover:bg-red-50"
+              >
+                <LogOut size={14} /> Cerrar sesión
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

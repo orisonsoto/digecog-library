@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, KeyRound, Fingerprint } from 'lucide-react';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { ShieldCheck, KeyRound, Fingerprint, AlertCircle } from 'lucide-react';
 import { DemoTag } from '../components/ui/primitives';
+import { useAppStore, CREDENCIAL_DEMO, validarCredencial } from '../store/appStore';
 
 const ROLES = [
   'Director General', 'Directores Misionales', 'Planificación y Desarrollo',
@@ -10,10 +11,75 @@ const ROLES = [
   'Entidad Reportante (SPNF)', 'Auditor', 'Ciudadanía',
 ];
 
+const CODIGO_MFA_DEMO = '482913';
+
 export default function Login() {
   const navigate = useNavigate();
+  const iniciarSesion = useAppStore((s) => s.iniciarSesion);
+  const autenticado = useAppStore((s) => s.autenticado);
+
   const [rol, setRol] = useState(ROLES[0]);
   const [paso, setPaso] = useState<'credenciales' | 'mfa'>('credenciales');
+  const [usuario, setUsuario] = useState('');
+  const [clave, setClave] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [digitos, setDigitos] = useState<string[]>(['', '', '', '', '', '']);
+  const [errorMfa, setErrorMfa] = useState<string | null>(null);
+
+  function validarCredenciales() {
+    const resultado = validarCredencial(usuario, clave);
+    if (!resultado.ok) {
+      setError(resultado.error ?? 'No fue posible iniciar sesión.');
+      return;
+    }
+    // Credenciales válidas → segundo factor (simulado). La sesión solo se abre tras el MFA.
+    setError(null);
+    setPaso('mfa');
+  }
+
+  function confirmarMfa() {
+    const codigo = digitos.join('');
+    if (codigo !== CODIGO_MFA_DEMO) {
+      setErrorMfa(`Código incorrecto. En el entorno de demostración el código es ${CODIGO_MFA_DEMO}.`);
+      return;
+    }
+    setErrorMfa(null);
+    const resultado = iniciarSesion(usuario, clave, rol);
+    if (resultado.ok) navigate('/');
+  }
+
+  /**
+   * Acepta un dígito por casilla, pero también escritura rápida y pegado del
+   * código completo: los dígitos sobrantes se distribuyen en las casillas siguientes.
+   */
+  function actualizarDigito(indice: number, valorCrudo: string) {
+    const anterior = digitos[indice];
+    let entrada = valorCrudo.replace(/\D/g, '');
+
+    // Al escribir sobre una casilla que ya tenía dígito, el navegador concatena: descartamos el previo.
+    if (anterior && entrada.length > 1 && entrada.startsWith(anterior)) {
+      entrada = entrada.slice(anterior.length);
+    }
+
+    if (!entrada) {
+      setDigitos((prev) => { const next = [...prev]; next[indice] = ''; return next; });
+      return;
+    }
+
+    setDigitos((prev) => {
+      const next = [...prev];
+      for (let k = 0; k < entrada.length && indice + k < 6; k++) {
+        next[indice + k] = entrada[k];
+      }
+      return next;
+    });
+
+    const siguiente = Math.min(indice + entrada.length, 5);
+    requestAnimationFrame(() => document.getElementById(`mfa-${siguiente}`)?.focus());
+  }
+
+  // Si ya hay sesión activa, no mostramos el acceso: vamos al Centro de Mando.
+  if (autenticado) return <Navigate to="/" replace />;
 
   return (
     <div className="min-h-screen w-full flex" style={{ background: 'linear-gradient(135deg, var(--color-brand-950), var(--color-brand-800) 60%, var(--color-brand-600))' }}>
@@ -62,19 +128,45 @@ export default function Login() {
               </select>
 
               <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">Usuario institucional</label>
-              <input defaultValue="director.general@digecog.gob.do" className="w-full mb-3 rounded-lg border border-[var(--border-subtle)] px-3 py-2 text-sm outline-none focus:border-[var(--color-brand-500)]" />
+              <input
+                value={usuario}
+                onChange={(e) => { setUsuario(e.target.value); setError(null); }}
+                onKeyDown={(e) => e.key === 'Enter' && validarCredenciales()}
+                placeholder="correo@ejemplo.com"
+                autoComplete="username"
+                className="w-full mb-3 rounded-lg border border-[var(--border-subtle)] px-3 py-2 text-sm outline-none focus:border-[var(--color-brand-500)]"
+              />
               <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">Contraseña</label>
-              <input type="password" defaultValue="••••••••••" className="w-full mb-4 rounded-lg border border-[var(--border-subtle)] px-3 py-2 text-sm outline-none focus:border-[var(--color-brand-500)]" />
+              <input
+                type="password"
+                value={clave}
+                onChange={(e) => { setClave(e.target.value); setError(null); }}
+                onKeyDown={(e) => e.key === 'Enter' && validarCredenciales()}
+                placeholder="••••"
+                autoComplete="current-password"
+                className="w-full mb-3 rounded-lg border border-[var(--border-subtle)] px-3 py-2 text-sm outline-none focus:border-[var(--color-brand-500)]"
+              />
+
+              {error && (
+                <div className="flex items-start gap-1.5 mb-3 rounded-lg bg-red-50 border border-red-200 px-2.5 py-2 text-[11px] text-red-700">
+                  <AlertCircle size={13} className="shrink-0 mt-px" /> {error}
+                </div>
+              )}
 
               <button
-                onClick={() => setPaso('mfa')}
+                onClick={validarCredenciales}
                 className="w-full rounded-lg py-2.5 text-sm font-semibold text-white mb-3"
                 style={{ background: 'var(--color-brand-700)' }}
               >
                 Continuar
               </button>
-              <div className="flex items-center gap-2 text-[11px] text-[var(--text-muted)] justify-center mb-1">
+              <div className="flex items-center gap-2 text-[11px] text-[var(--text-muted)] justify-center mb-2">
                 <ShieldCheck size={13} /> Single Sign-On · Segregación de funciones (RBAC)
+              </div>
+              <div className="rounded-lg bg-slate-50 border border-[var(--border-subtle)] px-2.5 py-2 text-[11px] text-[var(--text-secondary)] mb-2">
+                <strong className="text-[var(--text-primary)]">Credenciales de demostración</strong><br />
+                Usuario: <code>{CREDENCIAL_DEMO.usuario}</code><br />
+                Contraseña: <code>{CREDENCIAL_DEMO.clave}</code> · Código MFA: <code>{CODIGO_MFA_DEMO}</code>
               </div>
               <div className="flex justify-center"><DemoTag label="ENTORNO DE DEMOSTRACIÓN" /></div>
             </>
@@ -87,16 +179,34 @@ export default function Login() {
                 <h1 className="text-lg font-bold text-[var(--text-primary)]">Verificación en dos pasos</h1>
                 <p className="text-xs text-[var(--text-secondary)]">Ingrese el código de 6 dígitos enviado a su dispositivo autenticador (MFA).</p>
                 <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <input key={i} maxLength={1} defaultValue={String((i * 7) % 10)} className="w-9 h-11 text-center rounded-lg border border-[var(--border-subtle)] text-lg font-bold outline-none focus:border-[var(--color-brand-500)]" />
+                  {digitos.map((d, i) => (
+                    <input
+                      key={i}
+                      id={`mfa-${i}`}
+                      inputMode="numeric"
+                      value={d}
+                      onChange={(e) => { actualizarDigito(i, e.target.value); setErrorMfa(null); }}
+                      onKeyDown={(e) => e.key === 'Enter' && confirmarMfa()}
+                      className="w-9 h-11 text-center rounded-lg border border-[var(--border-subtle)] text-lg font-bold outline-none focus:border-[var(--color-brand-500)]"
+                    />
                   ))}
                 </div>
+
+                {errorMfa && (
+                  <div className="flex items-start gap-1.5 w-full rounded-lg bg-red-50 border border-red-200 px-2.5 py-2 text-[11px] text-red-700 text-left">
+                    <AlertCircle size={13} className="shrink-0 mt-px" /> {errorMfa}
+                  </div>
+                )}
+
                 <button
-                  onClick={() => navigate('/')}
-                  className="w-full rounded-lg py-2.5 text-sm font-semibold text-white flex items-center justify-center gap-2 mt-2"
+                  onClick={confirmarMfa}
+                  className="w-full rounded-lg py-2.5 text-sm font-semibold text-white flex items-center justify-center gap-2 mt-1"
                   style={{ background: 'var(--color-brand-700)' }}
                 >
                   <KeyRound size={15} /> Ingresar como {rol}
+                </button>
+                <button onClick={() => { setPaso('credenciales'); setErrorMfa(null); }} className="text-[11px] text-[var(--text-muted)] hover:text-[var(--color-brand-600)]">
+                  ← Volver
                 </button>
               </div>
             </>

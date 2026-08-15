@@ -18,6 +18,23 @@ React 19 + TypeScript + Vite + Tailwind CSS v4 + React Router (HashRouter) + Rec
 No requiere backend, base de datos ni variables de entorno: todo el dataset se genera en el cliente
 a partir de `src/data/generator.ts`.
 
+## Acceso al prototipo (autenticación simulada)
+
+La aplicación abre en una pantalla de acceso institucional con doble factor simulado:
+
+| Campo | Valor |
+|---|---|
+| Usuario | `orisonsoto@gmail.com` |
+| Contraseña | `1234` |
+| Código MFA | `482913` |
+
+> **Importante:** la validación ocurre íntegramente en el navegador contra una credencial fija visible
+> en el código fuente. **No es un mecanismo de seguridad real** — es parte del mockup (módulo "Login"
+> del inventario de pantallas) y no debe usarse para proteger información sensible. En una
+> implementación real la autenticación se delegaría a Single Sign-On institucional con MFA y RBAC.
+
+La sesión se guarda en `sessionStorage`, por lo que se mantiene al recargar y se cierra al cerrar la pestaña.
+
 ## Desarrollo local
 
 ```bash
