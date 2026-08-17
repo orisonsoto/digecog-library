@@ -24,7 +24,7 @@ La aplicación abre en una pantalla de acceso institucional con doble factor sim
 
 | Campo | Valor |
 |---|---|
-| Usuario | `orisonsoto@gmail.com` |
+| Usuario | `lauraperez@gmail.com` |
 | Contraseña | `1234` |
 | Código MFA | `482913` |
 

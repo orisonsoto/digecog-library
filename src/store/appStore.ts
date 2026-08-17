@@ -10,7 +10,7 @@ import { PERIODO_ACTUAL } from '../data/periodos';
 // del prompt maestro y docs/01-descubrimiento-arquitectura.md).
 // ---------------------------------------------------------------------------
 export const CREDENCIAL_DEMO = {
-  usuario: 'orisonsoto@gmail.com',
+  usuario: 'lauraperez@gmail.com',
   clave: '1234',
 };
 
